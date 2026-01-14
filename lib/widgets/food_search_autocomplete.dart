@@ -1,3 +1,4 @@
+import 'package:carbcheck/app_colors.dart';
 import 'package:carbcheck/services/food_serving_standards.dart';
 import 'package:flutter/material.dart';
 
@@ -80,119 +81,141 @@ class _FoodSearchAutocompleteState extends State<FoodSearchAutocomplete> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 🔍 Search Field
-        TextField(
-          controller: _controller,
-          decoration: InputDecoration(
-            hintText: 'Search foods (e.g., "apple", "rice")...',
-            prefixIcon: const Icon(Icons.search, color: Colors.teal),
-            suffixIcon: _controller.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: _clearSearch,
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.grey),
-            ),
-            filled: true,
-            fillColor: Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 16,
-            ),
-          ),
-          onChanged: _updateSuggestions,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // 🔍 Search Field
+    TextField(
+      controller: _controller,
+      decoration: InputDecoration(
+        hintText: 'Search foods (e.g., "apple", "rice")...',
+        hintStyle: TextStyle(
+          fontSize: 15,
+          color: AppColors.textSecondary,
         ),
-        const SizedBox(height: 8),
+        prefixIcon: Icon(
+          Icons.search,
+          color: AppColors.primary,
+        ),
+        suffixIcon: _controller.text.isNotEmpty
+            ? IconButton(
+                icon: Icon(Icons.clear, color: AppColors.textSecondary),
+                onPressed: _clearSearch,
+              )
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        filled: true,
+        fillColor: AppColors.background,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 18, // ⬆ taller field
+        ),
+      ),
+      style: TextStyle(
+        fontSize: 16, // ⬆ input text size
+        color: AppColors.textPrimary,
+      ),
+      onChanged: _updateSuggestions,
+    ),
 
-        // 💡 Loading Indicator
-        if (_isLoading)
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(Colors.teal[600]),
+    const SizedBox(height: 8),
+
+    // 💡 Loading Indicator
+    if (_isLoading)
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: SizedBox(
+          height: 22,
+          width: 22,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation(AppColors.primary),
+          ),
+        ),
+      ),
+
+    // ✅ Suggestions List
+    if (_suggestions.isNotEmpty && !_isLoading)
+      Container(
+        constraints: const BoxConstraints(maxHeight: 300),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(8),
+          color: AppColors.card,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.textPrimary.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ListView.separated(
+          itemCount: _suggestions.length,
+          separatorBuilder: (_, __) =>
+              Divider(height: 1, color: AppColors.divider),
+          itemBuilder: (context, index) {
+            final food = _suggestions[index];
+            return _buildSuggestionTile(food);
+          },
+        ),
+      )
+
+    // ❌ No Results Message
+    else if (_controller.text.isNotEmpty &&
+        _suggestions.isEmpty &&
+        !_isLoading)
+      Container(
+        margin: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.warning.withOpacity(0.12),
+          border: Border.all(color: AppColors.warning),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: AppColors.warning),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'No foods found',
+                    style: TextStyle(
+                      fontSize: 15, // ⬆
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Try simpler terms like "apple" or "rice"',
+                    style: TextStyle(
+                      fontSize: 13, // ⬆
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+  ],
+);
 
-        // ✅ Suggestions List
-        if (_suggestions.isNotEmpty && !_isLoading)
-          Container(
-            constraints: const BoxConstraints(maxHeight: 300),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.separated(
-              itemCount: _suggestions.length,
-              separatorBuilder: (context, index) =>
-                  Divider(height: 1, color: Colors.grey[200]),
-              itemBuilder: (context, index) {
-                final food = _suggestions[index];
-                return _buildSuggestionTile(food);
-              },
-            ),
-          )
-
-        // ❌ No Results Message
-        else if (_controller.text.isNotEmpty &&
-            _suggestions.isEmpty &&
-            !_isLoading)
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.orange[50],
-              border: Border.all(color: Colors.orange[200]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.orange[700]),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'No foods found',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[900],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Try simpler terms like "apple" or "rice"',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.orange[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
   }
 
   /// Build individual suggestion tile

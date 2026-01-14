@@ -17,6 +17,8 @@ dependencies:
 
   equatable: ^2.0.5
   http: ^1.1.0
+  lottie: ^3.3.2
+  google_fonts: ^7.0.2
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +31,8 @@ flutter:
 
   assets:
     - assets/FoodData_Central_foundation_food_json_2025-12-18.json
+    - assets/launch.json
+    - assets/snacks.json
+    - assets/Breakfast.json
+    - assets/dinner.json
+    - assets/Complete.json

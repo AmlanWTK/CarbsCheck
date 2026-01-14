@@ -1,3 +1,4 @@
+import 'package:carbcheck/app_colors.dart';
 import 'package:carbcheck/model/PlateItem.dart';
 import 'package:carbcheck/model/glucose_models.dart';
 import 'package:carbcheck/model/nutrition_models.dart';
@@ -523,39 +524,69 @@ Future<void> _initializeAndCalculate() async {
 
   // RECOMMENDATIONS CARD
   Widget _buildRecommendationsCard() {
-    return Card(
-      color: Colors.blue[50],
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Recommendations',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+  if (glucoseImpact?.recommendations == null) return const SizedBox.shrink();
+
+  return Container(
+    margin: const EdgeInsets.only(bottom: 16),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(16),
+      gradient: AppColors.accentGradient,
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.accent.withOpacity(0.25),
+          blurRadius: 14,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: AppColors.card.withOpacity(0.92), // frosted layer
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.accent.withOpacity(0.15),
+                ),
+                child: Icon(
+                  Icons.lightbulb_outline,
+                  color: AppColors.accent,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            if (glucoseImpact!.recommendations != null) ...[
-              Row(
-                children: [
-                  const Icon(Icons.lightbulb, color: Colors.blue, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      glucoseImpact!.recommendations!,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Text(
+                'Recommendations',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ],
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            glucoseImpact!.recommendations!,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ITEM LIST CARD
   Widget _buildItemListCard() {
