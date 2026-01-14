@@ -1,7 +1,5 @@
-import 'package:carbcheck/screens/PlateScreen%20.dart';
-import 'package:carbcheck/screens/nutrition_screen.dart';
 import 'package:flutter/material.dart';
-
+import 'package:carbcheck/screens/meal_estimation_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,22 +11,42 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MyApp - FoodImpact Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'CarbCheck - Meal Estimation',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        // Main screen for adding multiple foods
-        '/': (context) => const PlateScreen(),
+      home: const MealEstimationApp(),
+    );
+  }
+}
 
-        // Nutrition screen for full plate
-        '/nutritionPlate': (context) => NutritionPlateScreen(
-              plateItems: ModalRoute.of(context)!.settings.arguments
-                  as List<Map<String, dynamic>>,
-            ),
+class MealEstimationApp extends StatefulWidget {
+  const MealEstimationApp({super.key});
+
+  @override
+  State<MealEstimationApp> createState() => _MealEstimationAppState();
+}
+
+class _MealEstimationAppState extends State<MealEstimationApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MealEstimationScreen(
+      patientProfile: null,
+      onMealEstimated: (estimate) {
+        _showMealSaved(estimate);
       },
+    );
+  }
+
+  void _showMealSaved(dynamic estimate) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Meal estimate saved: ${estimate.mealType}'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 }
